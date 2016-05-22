@@ -1,0 +1,74 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, height=device-height">
+            <script>
+                var ipValue;
+                var connection;
+                connection.onopen = function () {
+                    connection.send('Message from Browser to ESP8266 yay its Working!! ' + new Date());
+                    connection.send('ping');
+                };
+            connection.onerror = function (error) {
+                console.log('WebSocket Error ', error);
+            };
+            connection.onmessage = function (e) {
+                console.log('Server: ', e.data);
+                
+            };
+            function ledFn() {
+                var toSend = "LED";
+                connection.send(toSend);
+            };
+            function resetFn() {
+                var toSend = "RESET";
+                connection.send(toSend);
+                document.getElementById("inputSliderR").value = "0";
+                document.getElementById("outputTextR").innerHTML="0";
+                document.getElementById("inputSliderL").value = "0";
+                document.getElementById("outputTextL").innerHTML="0";
+            };
+
+            function mod(){
+                var text = document.getElementById('ip').value;
+                ipValue = text;
+                connection = new WebSocket(ipValue, ['arduino']);
+                //console.log(text)
+                console.log("IP value changed to:"+ipValue);
+            }
+
+            function showValueR(newValue)
+            {
+                document.getElementById("outputTextR").innerHTML=newValue;
+                
+                connection.send("x"+newValue);
+            }
+            
+            function showValueL(newValue)
+            {
+                document.getElementById("outputTextL").innerHTML=newValue;
+                
+                connection.send("y"+newValue);
+            }
+
+            </script>
+            
+    </head>
+    <body style="height=100% width=100%">
+        Bristle Bot<p></p>
+        
+        <table id="outside">
+            <input type="text"  placeholder="Input the IP of your Websocket server" id="ip" onchange="mod()"> E.g ws://192.168.4.1:81/ </tr>
+                
+                </table>
+        
+        <input type="button" onclick="ledFn()">Blink LED	<p><p></p>
+            <input type="button" onclick="resetFn()">Reset LED <p></p>
+                
+                
+                <input type="range" id= "inputSliderR" min="0" max="255" value="0" step="5" oninput="showValueR(this.value)" /> R      
+                <br><br><span id="outputTextR">0</span><p></p>
+                <input type="range" id= "inputSliderL" min="0" max="255" value="0" step="5" oninput="showValueL(this.value)" />  G
+                <br><br><span id="outputTextL">0</span><p></p>
+                
+    </body>
+</html>
